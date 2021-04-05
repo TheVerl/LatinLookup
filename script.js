@@ -113,12 +113,19 @@ document.addEventListener("keydown", function(event) {
     }
 });
 
+function error()
+{
+    $('.errorDiv').show();
+    $('.loadingDiv').hide();
+}
+
 function wikiJS(oldWord, language, scrollTo) {
     $('.results').append(`<div class="individualResult" id="` + oldWord + `"><h2>` + oldWord + `</h2>
     <div class="loadingDiv"><img src="loading.gif" alt="Loading" class="loadingIcon"/><span class="loadingInfo">Loading...</span></div>
     <div class="errorDiv" style="display: none;"><i class="material-icons errorIcon">error_outline</i><span class="loadingInfo">There was an error looking up the word on our end.</span></div>
 </div>`);
     const URL = "https://crossrun.herokuapp.com/https://en.wiktionary.org/w/api.php?titles=" + oldWord + "&action=query&prop=extracts&format=json";
+    let errorTimer = setTimeout(error, 3000);
     var jqxhr = $.get(URL, function() {})
         .done(function() {
             var response = jqxhr.responseJSON.query.pages;
@@ -130,6 +137,7 @@ function wikiJS(oldWord, language, scrollTo) {
                 var toCheck = item.substring(0,30);
                 var toCheckLower = toCheck.toLowerCase();
                 if (toCheckLower.indexOf(inputLanguage) >= 0) {
+                    clearTimeout(errorTimer);
                     var wordInfo = item;
                     console.log(wordInfo);
                     $('.loadingDiv').hide();
@@ -147,8 +155,9 @@ function wikiJS(oldWord, language, scrollTo) {
             });
         })
         .fail(function() {
-            $('.errorDiv').show();
-            $('.loadingDiv').hide();
+            error();
+            //$('.errorDiv').show();
+            //$('.loadingDiv').hide();
         })
 }
 
